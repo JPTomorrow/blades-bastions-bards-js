@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<head>
+<title>Blades, Bastions, and Bards</title>
+<meta name=viewport content=width=device-width,height=device-height,initial-scale=1 />
+<meta name=apple-mobile-web-app-cabable content=yes />
+<meta name=mobile-web-app-cabable content=yes />
+<style>
+* { 
+    padding: 0;
+    margin: 0;
+    font-family: "game-font", sans-serif;
+    color: #fff;
+}
+body {
+    background-color: #2e2626;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+ }
+ button {
+    font-size: 24pt;
+    padding: 10px;
+    border: 2px solid #989898;
+    border-radius: 10px;
+    background-color: #3b3b3b;
+ }
+ button:hover {
+    background-color: #5e5e5e;
+ }
+ #buttons {
+    padding-bottom: 20px;
+ }
+ #title {
+     padding-top: 20px;
+     padding-bottom: 20px;
+     color: #e6e6e6;
+}
+ #game-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20px;
+    padding-right: 20px;
+ }
+canvas {
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    /* border: 3px solid #000;  */
+    }
+dialog {
+    background-color: #2e2626;
+    inset: 0.5rem;
+    margin: auto;
+    min-width: 30%;
+    max-height: 50%;
+    border-radius: 20px;
+    padding: 20px;
+    overflow: auto;
+}
+dialog h1 {
+    font-size: 32pt;
+    text-decoration: underline;
+    padding-bottom: 10px;
+    text-align: center;
+
+}
+dialog p {
+    font-size: 24pt;
+}
+#controls {
+    display: flex;
+    justify-content: space-between;
+    width: 720px;
+}
+.faith {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.faith img {
+    width: 30px;
+    /* IE, only works on <img> tags */
+    -ms-interpolation-mode: nearest-neighbor;
+    /* Firefox */
+    image-rendering: crisp-edges;
+    /* Chromium + Safari */
+    image-rendering: pixelated;
+}
+#sfx-icon {
+    padding: 0;
+    margin: 0;
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+</style>
+</head>
+<body onload="onLoadPage()">
+    <h1 id="title">Blades, Bastions, and Bards</h1>
+    <div id="controls">
+        <div class="faith">
+            <img src="./res/white_faith.png" />
+            <h1>: 0</h1>
+        </div>
+        <div id="buttons">
+            <button onclick="toggleRulebook()">Rules</button>
+            <button onclick="GameState.showTokenControlNumbers = !GameState.showTokenControlNumbers">Show Control</button>
+            <button id="sfx-mute-btn" onclick="toggleSoundEffects()"><img id="sfx-icon" width="25px" height="25px" src="./res/sfx_icon_enabled.png" /></button>
+            <button onclick="getAudio('bgm_1').muted = !getAudio('bgm_1').muted">BGM</button>
+        </div>
+        <div class="faith">
+            <img src="./res/black_faith.png" />
+            <h1>: 0</h1>
+        </div>
+    </div>
+    <div id="game-container">
+        <canvas id="game-canvas" />
+    </div>
+    <dialog id="rulebook">
+        <h1>Rules</h1>
+        <p>This is a blade.</p>
+        <p>This is a bastion.</p>
+        <p>This is a bard.</p>
+    </dialog>
+    <audio class="sfx" id="place_1" src="./res/sfx/place_1.mp3" />
+    <audio class="sfx" id="place_2" src="./res/sfx/place_2.mp3" />
+    <audio class="sfx" id="place_3" src="./res/sfx/place_3.mp3" />
+    <audio class="sfx" id="place_4" src="./res/sfx/place_4.mp3" />
+    <audio class="sfx" id="place_5" src="./res/sfx/place_5.mp3" />
+    <audio class="sfx" id="place_6" src="./res/sfx/place_6.mp3" />
+    <audio class="sfx" id="place_7" src="./res/sfx/place_7.mp3" />
+    <audio class="sfx" id="place_8" src="./res/sfx/place_8.mp3" />
+    <audio class="sfx" id="place_9" src="./res/sfx/place_9.mp3" />
+    <audio class="sfx" id="place_10" src="./res/sfx/place_10.mp3" />
+    <audio class="sfx" id="place_11" src="./res/sfx/place_11.mp3" />
+    <audio class="sfx" id="place_12" src="./res/sfx/place_12.mp3" />
+    <audio class="sfx" id="place_13" src="./res/sfx/place_13.mp3" />
+    <audio class="sfx" id="place_14" src="./res/sfx/place_14.mp3" />
+    <audio class="sfx" id="place_15" src="./res/sfx/place_15.mp3" />
+    <audio class="sfx" id="place_16" src="./res/sfx/place_16.mp3" />
+    <audio class="sfx" id="place_17" src="./res/sfx/place_17.mp3" />
+    <audio class="sfx" id="place_18" src="./res/sfx/place_18.mp3" />
+    <audio class="sfx" id="place_19" src="./res/sfx/place_19.mp3" />
+    <audio class="sfx" id="place_20" src="./res/sfx/place_20.mp3" />
+    <!-- bgm  -->
+    <audio muted id="bgm_1" src="./res/sfx/bgm_1.mp3" />
+    <script src="./setup.js"></script>
+    <script src="./game.js"></script>
+</body>
+
+</html>
