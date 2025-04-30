@@ -431,6 +431,7 @@ class SacredSite {
 }
 
 async function generateSacredSites() {
+    GameState.isHumanPlayerTurn = false;
     await delay(1000);
     for (let i = 0; i < SacredSite.siteCount; i++) {
         let x = randInt(1, gridWidth - 2);
@@ -443,6 +444,7 @@ async function generateSacredSites() {
         getCellAtPosition(x, y).sacredSite = new SacredSite()
         await delay(500);
     }
+    GameState.isHumanPlayerTurn = true;
 }
 
 function drawSacredSites(deltaTime) {
@@ -937,9 +939,12 @@ class MainMenu {
     /** @type {HTMLCanvasElement} */
     static mmCanvas;
     static showStartMenu = true;
+    static startMenuFinished = false;
+    static prologueMenuFinished = false;
     static showPrologue = false;
     startMenuFadeElapsed = 0.0;
     prologueFadeInElapsed = 0.0;
+    prologueFadeOutElapsed = 0.0;
 
     constructor() {
         MainMenu.mmCanvas = document.createElement("canvas");
@@ -965,11 +970,15 @@ class MainMenu {
                 MainMenu.showStartMenu = false;
                 break;
             case MainMenuScreen.prologue:
-                canvas.hidden = false;
-                MainMenu.mmCanvas.hidden = true;
-                playAudio("bgm_1", true, 0.1); // hack to get passed autoplay restrictions
-                generateSacredSites();
-                GameState.currentStage = Stage.Game;
+                MainMenu.showPrologue = false;
+                console.log(MainMenu.showPrologue);
+                setTimeout(() => {
+                    MainMenu.mmCanvas.hidden = true;
+                    playAudio("bgm_1", true, 0.1); // hack to get passed autoplay restrictions
+                    generateSacredSites();
+                    canvas.hidden = false;
+                    GameState.currentStage = Stage.Game;
+                }, 10000);
                 break;
         }
     }
@@ -985,15 +994,20 @@ function drawMainMenu(deltaTime) {
     mmCtx.fillRect(0, 0, canvas.width, canvas.height);
 
     let startAlpha = 1.0;
-    if (startAlpha > 0.0) {
+    let pAlpha = 0.0;
+    if (!MainMenu.startMenuFinished) {
         if (MainMenu.showStartMenu) {
             startAlpha = Math.max(0.7, Math.min(Math.sin(Date.now() / 700), 1.0));
         } else {
             mainMenu.startMenuFadeElapsed += deltaTime / 1000;
             startAlpha = lerp(1.0, 0.0, mainMenu.startMenuFadeElapsed / 1.0);
+            startAlpha = Math.max(0.0, Math.min(startAlpha, 1.0));
             // console.log(startAlpha)
-            if (startAlpha <= 0.0) {
+            if (startAlpha <= 0.0 && !MainMenu.startMenuFinished) {
+                console.log("stop")
+                MainMenu.startMenuFinished = true;
                 MainMenu.showPrologue = true;
+                pAlpha = 0.01;
             }
         }
         const headerTextColor = `rgba(142, 120, 74, ${startAlpha})`;
@@ -1007,11 +1021,18 @@ function drawMainMenu(deltaTime) {
 
     }
 
-    let pAlpha = 0.0;
-    if (MainMenu.showPrologue) {
-        // console.log("test")
-        mainMenu.prologueFadeInElapsed += deltaTime / 1000;
-        pAlpha = lerp(0.0, 1.0, mainMenu.prologueFadeInElapsed / 1.0);
+    if (!MainMenu.prologueFinished) {
+        if (MainMenu.showPrologue) {
+            console.log(MainMenu.showPrologue);
+            mainMenu.prologueFadeInElapsed += deltaTime / 1000;
+            pAlpha = lerp(0.01, 1.0, mainMenu.prologueFadeInElapsed / 1.0);
+        } else {
+            console.log("fading out");
+            mainMenu.prologueFadeOutElapsed += deltaTime / 1000;
+            pAlpha = lerp(1.0, 0.0, mainMenu.prologueFadeOutElapsed / 1.0);
+        }
+        pAlpha = Math.max(0.0, Math.min(pAlpha, 1.0));
+        // console.log(pAlpha);
         const bodyTextColor = `rgba(255,255,255, ${pAlpha})`;
         const bodyText = [
             "Two gods are locked",
@@ -1031,7 +1052,9 @@ function drawMainMenu(deltaTime) {
         }
 
         const img = images["god_fight"];
+        mmCtx.globalAlpha = pAlpha;
         mmCtx.drawImage(img, canvas.width / 2 - img.width / 2, 75);
+        mmCtx.globalAlpha = 1;
     }
 }
 
@@ -1047,6 +1070,7 @@ function gameLoop(timestamp) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height); // clears to transparent
 
+    input();
     update(deltaTime);
     render(deltaTime);
 
@@ -1054,6 +1078,10 @@ function gameLoop(timestamp) {
     // Request the browser to call this function again on the next animation frame
     lastTime = timestamp;
     requestAnimationFrame(gameLoop);
+}
+
+function input() {
+
 }
 
 function update(deltaTime) {
@@ -1080,6 +1108,14 @@ function render(deltaTime) {
     }
 }
 
+function init() {
+    mainMenu = new MainMenu();
+    loadFont();
+    loadImages();
+    loadAnims();
+    initGrid();
+}
+
 function main() {
     canvas = document.getElementById("game-canvas");
     ctx = canvas.getContext("2d");
@@ -1087,11 +1123,6 @@ function main() {
     canvas.addEventListener('mouseout', handleMouseExitCanvas);
     canvas.addEventListener('mousedown', handleMouseClick, false);
 
-    mainMenu = new MainMenu();
-    loadFont();
-    loadImages();
-    loadAnims();
-    initGrid();
     requestAnimationFrame(gameLoop);
     console.log("game initialized")
 }
